@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { nanoid } from "nanoid";
 
 import "./App.css";
 import Die from "./components/Die";
@@ -8,13 +9,37 @@ function App() {
     let arr = [];
     let i = 1;
     while (i <= 10) {
-      arr.push(Math.ceil(Math.random() * 6));
+      arr.push({
+        value: Math.ceil(Math.random() * 6),
+        isHeld: true,
+        id: nanoid(),
+      });
       i++;
     }
     return arr;
   }
+
+  const hold = (id) => {
+    setDice((prev) =>
+      prev.map((die) => {
+        if (id === die.id) {
+          return { ...die, isHeld: !die.isHeld };
+        } else {
+          return die;
+        }
+      })
+    );
+  };
+
   const [dice, setDice] = useState(randomDice);
-  const renderDice = dice.map((value) => <Die value={value} />);
+  const renderDice = dice.map((diceObj) => (
+    <Die
+      hold={() => hold(diceObj.id)}
+      key={diceObj.id}
+      isHeld={diceObj.isHeld}
+      value={diceObj.value}
+    />
+  ));
   const reRoll = () => {
     setDice(randomDice);
   };
