@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { nanoid } from "nanoid";
 import Die from "./components/Die";
 import Instruction from "./components/Instruction";
+import Toast from "./components/Toast";
+import Confetti from "react-confetti";
 
 function App() {
   const [dice, setDice] = useState(randomDice);
+  const [showToast, setShowToast] = useState(false);
+
   const gameWon =
-    dice.every((die) => die.isHeld) && dice.every((die) => die.value);
+    dice.every((die) => die.isHeld) &&
+    dice.every((die) => die.value === dice[0].value);
+
+  useEffect(() => {
+    if (gameWon) {
+      setShowToast(true);
+    }
+  }, [gameWon]);
 
   function randomDice() {
     let arr = [];
@@ -50,6 +61,11 @@ function App() {
 
   return (
     <>
+      <Toast
+        message="You Won!"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
       <main className="flex h-200 w-250 flex-col items-center justify-center gap-20 rounded-2xl bg-[#F5F5F5]">
         <Instruction />
         <div className="grid grid-cols-5 gap-15">{renderDice}</div>
@@ -68,6 +84,7 @@ function App() {
             Roll
           </button>
         )}
+        {gameWon && <Confetti />}
       </main>
     </>
   );
