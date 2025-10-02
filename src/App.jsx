@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { nanoid } from "nanoid";
-
-import "./App.css";
 import Die from "./components/Die";
+import Instruction from "./components/Instruction";
 
 function App() {
+  const [dice, setDice] = useState(randomDice);
+  const gameWon =
+    dice.every((die) => die.isHeld) && dice.every((die) => die.value);
+
   function randomDice() {
     let arr = [];
     let i = 1;
     while (i <= 10) {
       arr.push({
         value: Math.ceil(Math.random() * 6),
-        isHeld: true,
+        isHeld: false,
         id: nanoid(),
       });
       i++;
@@ -22,16 +25,11 @@ function App() {
   const hold = (id) => {
     setDice((prev) =>
       prev.map((die) => {
-        if (id === die.id) {
-          return { ...die, isHeld: !die.isHeld };
-        } else {
-          return die;
-        }
+        return die.id === id ? { ...die, isHeld: !die.isHeld } : die;
       })
     );
   };
 
-  const [dice, setDice] = useState(randomDice);
   const renderDice = dice.map((diceObj) => (
     <Die
       hold={() => hold(diceObj.id)}
@@ -41,19 +39,35 @@ function App() {
     />
   ));
   const reRoll = () => {
-    setDice(randomDice);
+    setDice((prev) =>
+      prev.map((dice) => {
+        return !dice.isHeld
+          ? { ...dice, value: Math.ceil(Math.random() * 6) }
+          : dice;
+      })
+    );
   };
 
   return (
     <>
       <main className="flex h-200 w-250 flex-col items-center justify-center gap-20 rounded-2xl bg-[#F5F5F5]">
+        <Instruction />
         <div className="grid grid-cols-5 gap-15">{renderDice}</div>
-        <button
-          onClick={reRoll}
-          className="font-karla h-25 w-60 cursor-pointer rounded-2xl bg-[#5035FF] text-5xl font-bold text-white shadow-2xl active:scale-95"
-        >
-          Roll
-        </button>
+        {gameWon ? (
+          <button
+            onClick={() => setDice(randomDice)}
+            className="font-karla h-25 w-80 cursor-pointer rounded-2xl bg-[#5035FF] text-5xl font-bold text-white shadow-2xl active:scale-95"
+          >
+            New Game
+          </button>
+        ) : (
+          <button
+            onClick={reRoll}
+            className="font-karla h-25 w-60 cursor-pointer rounded-2xl bg-[#5035FF] text-5xl font-bold text-white shadow-2xl active:scale-95"
+          >
+            Roll
+          </button>
+        )}
       </main>
     </>
   );
