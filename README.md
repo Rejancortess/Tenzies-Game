@@ -25,5 +25,3 @@ A web app game built in React, Vite, and Tailwind CSS, primarily using JavaScrip
    ```
 
 5. **Open your browser and visit** `http://localhost:5173` **to play the game.**
-
-Rejan commits
